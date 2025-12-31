@@ -1,7 +1,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import { OrgNode, AccountAnalysis } from '../types';
+import { OrgNode, AccountAnalysis } from '../types.ts';
 
 interface OrgChartProps {
   data: AccountAnalysis;

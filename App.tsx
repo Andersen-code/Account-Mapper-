@@ -1,8 +1,8 @@
 
 import React, { useState, useMemo } from 'react';
-import { analyzeAccountDocument } from './services/geminiService';
-import { AccountAnalysis, ProcessingState, OrgNode } from './types';
-import OrgChart from './components/OrgChart';
+import { analyzeAccountDocument } from './services/geminiService.ts';
+import { AccountAnalysis, ProcessingState, OrgNode } from './types.ts';
+import OrgChart from './components/OrgChart.tsx';
 
 const App: React.FC = () => {
   const [analysis, setAnalysis] = useState<AccountAnalysis | null>(null);

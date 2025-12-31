@@ -1,8 +1,11 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { AccountAnalysis } from "../types";
+import { AccountAnalysis } from "../types.ts";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Note: In browser environments, process.env.API_KEY is usually injected at build time 
+// or available globally. We use a fallback to prevent immediate crashes.
+const apiKey = typeof process !== 'undefined' ? process.env.API_KEY : '';
+const ai = new GoogleGenAI({ apiKey: apiKey || '' });
 
 const RESPONSE_SCHEMA = {
   type: Type.OBJECT,
