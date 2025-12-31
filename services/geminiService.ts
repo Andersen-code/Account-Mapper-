@@ -2,9 +2,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AccountAnalysis } from "../types.ts";
 
-// Initialize AI strictly according to guidelines
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 const RESPONSE_SCHEMA = {
   type: Type.OBJECT,
   properties: {
@@ -17,7 +14,7 @@ const RESPONSE_SCHEMA = {
           id: { type: Type.STRING },
           name: { type: Type.STRING },
           title: { type: Type.STRING },
-          managerId: { type: Type.STRING, description: "ID of manager. If unknown, leave null or infer from title seniority (e.g. Manager reports to Director)." },
+          managerId: { type: Type.STRING, description: "ID of manager. If unknown, leave null or infer from title seniority." },
           department: { type: Type.STRING },
           buyingRole: { 
             type: Type.STRING, 
@@ -45,6 +42,9 @@ const RESPONSE_SCHEMA = {
 
 export const analyzeAccountDocument = async (text: string): Promise<AccountAnalysis> => {
   try {
+    // Strictly following GoogleGenAI initialization guidelines
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
+    
     const response = await ai.models.generateContent({
       model: "gemini-3-pro-preview",
       contents: [{
@@ -56,7 +56,6 @@ export const analyzeAccountDocument = async (text: string): Promise<AccountAnaly
             1. TITLE PARITY: Titles like "VP", "Vice President", "SVP" are senior leadership. They should not report to Directors or Managers.
             2. INFERENCE: If reporting lines aren't explicit, use seniorityRank to build a logical tree. Lower ranks report to higher ranks within the same department.
             3. DUPLICATES: If a person appears multiple times with slightly different names, merge them.
-            4. ACCURACY: If the text doesn't mention a manager, leave managerId null rather than guessing blindly.
 
             INPUT DOCUMENTS:
             """
@@ -75,7 +74,7 @@ export const analyzeAccountDocument = async (text: string): Promise<AccountAnaly
 
     const parsed = JSON.parse(response.text || "{}") as AccountAnalysis;
     
-    // Final validation of IDs to ensure the tree is valid
+    // Final ID validation to ensure tree integrity
     const validIds = new Set(parsed.contacts.map(c => c.id));
     parsed.contacts = parsed.contacts.map(c => ({
       ...c,
@@ -85,6 +84,6 @@ export const analyzeAccountDocument = async (text: string): Promise<AccountAnaly
     return parsed;
   } catch (err: any) {
     console.error("Gemini Analysis Error:", err);
-    throw new Error(err.message || "Failed to analyze document. The model may be busy or the input was unreadable.");
+    throw new Error(err.message || "Failed to analyze document.");
   }
 };

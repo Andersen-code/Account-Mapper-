@@ -12,26 +12,46 @@
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
         }
-        .node-enter {
-            opacity: 0;
-            transform: scale(0.9);
-        }
-        .node-enter-active {
-            opacity: 1;
-            transform: scale(1);
-            transition: all 300ms ease-out;
+        /* Visual feedback if the script hasn't loaded yet */
+        #root:empty::before {
+            content: 'Initializing Application...';
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
     </style>
 <script type="importmap">
 {
   "imports": {
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "d3": "https://esm.sh/d3@^7.9.0"
+    "react": "https://esm.sh/react@19.0.0",
+    "react/": "https://esm.sh/react@19.0.0/",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/": "https://esm.sh/react-dom@19.0.0/",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "@google/genai": "https://esm.sh/@google/genai@1.34.0",
+    "d3": "https://esm.sh/d3@7.9.0"
   }
 }
+</script>
+<script>
+    // Global error listener to help debug environment issues
+    window.onerror = function(message, source, lineno, colno, error) {
+        console.error("Initialization Error:", message, "at", source, ":", lineno);
+        const root = document.getElementById('root');
+        if (root && root.innerHTML === '') {
+            root.innerHTML = '<div style="padding: 40px; text-align: center; color: #ef4444; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; justify-content: center;">' +
+                             '<h2 style="font-weight: 800; margin-bottom: 8px;">Application Load Error</h2>' +
+                             '<p style="color: #64748b; font-size: 14px; margin-bottom: 24px;">' + message + '</p>' +
+                             '<div><button onclick="location.reload()" style="padding: 10px 24px; background: #0f172a; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;">Retry Load</button></div>' +
+                             '</div>';
+        }
+    };
 </script>
 </head>
 <body>
